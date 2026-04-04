@@ -4,6 +4,9 @@ const axios = require("axios");
 const app = express();
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("API работает");
+});
 // === ПЕРЕМЕННЫЕ (заполни после получения от банка) ===
 const SECRET_KEY = process.env.SECRET_KEY || "";
 const PUBLIC_ID = process.env.PUBLIC_ID || "";
