@@ -35,7 +35,7 @@ app.post("/create-payment", async (req, res) => {
       },
       {
         headers: {
-          Authorization: Bearer ${SECRET_KEY},
+          Authorization: `Bearer ${SECRET_KEY}`,
           "Content-Type": "application/json"
         }
       }
