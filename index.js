@@ -4,38 +4,59 @@ const axios = require("axios");
 const app = express();
 app.use(express.json());
 
-// === переменные из окружения ===
-const MERCHANT_ID = process.env.MERCHANT_ID;
-const SECRET_KEY = process.env.SECRET_KEY;
+// === ПЕРЕМЕННЫЕ (заполни после получения от банка) ===
+const SECRET_KEY = process.env.SECRET_KEY || "";
+const PUBLIC_ID = process.env.PUBLIC_ID || "";
 
-const CLOUDKASSIR_PUBLIC_ID = process.env.CLOUDKASSIR_PUBLIC_ID;
-const CLOUDKASSIR_API_PASSWORD = process.env.CLOUDKASSIR_API_PASSWORD;
-
-// === проверка работы сервера ===
+// === ПРОВЕРКА РАБОТЫ СЕРВЕРА ===
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-// === создать оплату (Райффайзен) ===
+// === СОЗДАНИЕ ПЛАТЕЖА ===
 app.post("/create-payment", async (req, res) => {
   try {
     const { amount } = req.body;
 
-    if (!amount) {
-      return res.status(400).json({ error: "No amount" });
-    }
+    res.json({
+      message: "Платёж пока заглушка",
+      amount: amount
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Ошибка создания платежа");
+  }
+});
+
+// === ФИСКАЛИЗАЦИЯ ЧЕКА (Raif API) ===
+app.post("/create-receipt", async (req, res) => {
+  try {
+    const { amount, email } = req.body;
 
     const response = await axios.post(
-      "https://pay.raif.ru/api/payments",
+      "https://pay.raif.ru/fiscal/v1/receipts/sell",
       {
-        merchantId: MERCHANT_ID,
-        amount: amount,
-        currency: "RUB",
-        returnUrl: "https://your-site.com/success"
+        receiptNumber: Date.now().toString(),
+        client: {
+          email: email || "test@test.ru"
+        },
+        items: [
+          {
+            name: "Услуга",
+            price: amount,
+            quantity: 1,
+            amount: amount,
+            paymentObject: "SERVICE",
+            paymentMode: "FULL_PAYMENT",
+            vatType: "VAT20"
+          }
+        ],
+        total: amount
       },
       {
         headers: {
-          Authorization: `Bearer ${SECRET_KEY}`,
+          Authorization: Bearer `${SECRET_KEY}`,
           "Content-Type": "application/json"
         }
       }
@@ -43,50 +64,18 @@ app.post("/create-payment", async (req, res) => {
 
     res.json(response.data);
   } catch (err) {
-    console.error("Create payment error:", err.response?.data || err.message);
-    res.status(500).json({ error: "Payment creation failed" });
+    console.error(err.response?.data || err.message);
+    res.status(500).send("Ошибка фискализации");
   }
 });
 
-// === callback от банка ===
-app.post("/callback", async (req, res) => {
-  try {
-    console.log("Callback received:", req.body);
-
-    const { status, amount } = req.body;
-
-    // если оплата успешна
-    if (status === "SUCCESS") {
-      try {
-        await axios.post(
-          "https://api.cloudpayments.ru/kkt/receipt",
-          {
-            Amount: amount,
-            Description: "Оплата услуги"
-          },
-          {
-            auth: {
-              username: CLOUDKASSIR_PUBLIC_ID,
-              password: CLOUDKASSIR_API_PASSWORD
-            },
-            headers: {
-              "Content-Type": "application/json"
-            }
-          }
-        );
-      } catch (err) {
-        console.error("CloudKassir error:", err.response?.data || err.message);
-      }
-    }
-
-    res.sendStatus(200);
-  } catch (err) {
-    console.error("Callback error:", err.message);
-    res.sendStatus(500);
-  }
+// === CALLBACK ОТ БАНКА ===
+app.post("/callback", (req, res) => {
+  console.log("Callback:", req.body);
+  res.sendStatus(200);
 });
 
-// === запуск сервера ===
+// === ЗАПУСК ===
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
