@@ -1,1 +1,11 @@
-a
+<h2>Оплата</h2>
+
+<input id="amount" placeholder="Сумма" />
+<button onclick="pay()">Оплатить</button>
+
+<script>
+function pay() {
+  const amount = document.getElementById("amount").value;
+  window.location.href = "/pay?amount=" + amount;
+}
+</script>
