@@ -1,4 +1,5 @@
 require("dotenv").config();
+console.log("FILE LOADED");
 
 const express = require("express");
 const mongoose = require("mongoose");
