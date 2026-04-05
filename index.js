@@ -24,48 +24,21 @@ app.get("/", (req, res) => {
 });
 
 
-// ОПЛАТА
-app.get("/pay", async (req, res) => {
-  try {
-    console.log("PAY HIT");
+// ОПЛАТА (НОВЫЙ ПРАВИЛЬНЫЙ ВАРИАНТ)
+app.get("/pay", (req, res) => {
+  console.log("PAY HIT");
 
-    const amount = req.query.amount;
-    console.log("Amount:", amount);
+  const amount = req.query.amount;
+  console.log("Amount:", amount);
 
-    const orderId = Date.now().toString();
-    console.log("ORDER ID:", orderId);
-    const body = {
-      publicId: process.env.RAIF_PUBLIC_ID,
-      amount: Number(amount),
-      currency: "RUB",
-      orderId,
-      description: "Оплата",
-      successUrl: `${process.env.BASE_URL}/success`,
-      failUrl: `${process.env.BASE_URL}/fail`
-    };
-    console.log("BODY SENT:", body);
-    const signature = crypto
-      .createHmac("sha256", process.env.RAIF_SECRET_KEY)
-      .update(JSON.stringify(body))
-      .digest("hex");
+  const orderId = Date.now().toString();
+  console.log("ORDER ID:", orderId);
 
-    const response = await axios.post(
-      "https://pay.raif.ru/api/payment/v1/orders",
-      body,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Signature-SHA256": signature
-        }
-      }
-    );
- console.log("RESPONSE DATA:", response.data);
-    res.redirect(response.data.paymentUrl);
+  const url = `https://pay.raif.ru/ecom/pay?publicId=${process.env.RAIF_PUBLIC_ID}&amount=${amount}&orderId=${orderId}&successUrl=${process.env.BASE_URL}/success&failUrl=${process.env.BASE_URL}/fail`;
 
-  } catch (err) {
-    console.error("PAY ERROR:", err.message);
-    res.status(500).send("Ошибка оплаты");
-  }
+  console.log("REDIRECT URL:", url);
+
+  res.redirect(url);
 });
 
 
@@ -167,11 +140,9 @@ app.get("/admin", async (req, res) => {
     res.send(html);
 
   } catch (err) {
-  console.error("PAY ERROR:", err.message);
-  console.error("FULL ERROR:", err.response?.data);
-
-  res.status(500).send("Ошибка оплаты");
-}
+    console.error("ADMIN ERROR:", err.message);
+    res.status(500).send("Ошибка");
+  }
 });
 
 
