@@ -147,7 +147,7 @@ app.get("/admin", async (req, res) => {
   let html = "<h1>Заказы</h1><table border='1'><tr><th>ID</th><th>Сумма</th><th>Статус</th></tr>";
 
   orders.forEach(o => {
-    html += <tr><td>${o.orderId}</td><td>${o.amount}</td><td>${o.status}</td></tr>;
+    html += `<tr><td>${o.orderId}</td><td>${o.amount}</td><td>${o.status}</td></tr>`;
   });
 
   html += "</table>";
