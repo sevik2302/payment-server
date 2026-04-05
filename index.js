@@ -23,18 +23,13 @@ app.get("/", (req, res) => {
 
 
 // ОПЛАТА
-app.get("/pay", async (req, res) => {
-  const { amount } = req.query;
+app.get('/pay', (req, res) => {
+  console.log("PAY HIT");
 
-  if (!amount) return res.send("Нет суммы");
+  const amount = req.query.amount;
+  console.log("Amount:", amount);
 
-  const orderId = Date.now().toString();
-
-  await Order.create({
-    orderId,
-    amount,
-    status: "pending",
-    receiptSent: false
+  res.send(`OK, amount = ${amount}`);
   });
 
   const body = {
