@@ -180,4 +180,6 @@ app.get("/admin", async (req, res) => {
     res.send(html);
 
   } catch (err) {
-    console.
+    console.error("ERROR:", err);
+  res.status(500).send("Ошибка");
+}
