@@ -33,7 +33,7 @@ app.get("/pay", async (req, res) => {
     console.log("Amount:", amount);
 
     const orderId = Date.now().toString();
-
+    console.log("ORDER ID:", orderId);
     const body = {
       publicId: process.env.RAIF_PUBLIC_ID,
       amount: Number(amount),
