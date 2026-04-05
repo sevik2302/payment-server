@@ -168,10 +168,11 @@ app.get("/admin", async (req, res) => {
     res.send(html);
 
   } catch (err) {
-    console.error("FULL ERROR:", err.response?.data);
-    console.error("ADMIN ERROR:", err.message);
-    res.status(500).send("Ошибка");
-  }
+    console.error("PAY ERROR:", err.message);
+  console.error("FULL ERROR:", err.response?.data);
+
+  res.status(500).send("Ошибка оплаты");
+}
 });
 
 
