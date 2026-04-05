@@ -24,21 +24,61 @@ app.get("/", (req, res) => {
 });
 
 
-// ОПЛАТА (НОВЫЙ ПРАВИЛЬНЫЙ ВАРИАНТ)
-app.get("/pay", (req, res) => {
-  console.log("PAY HIT");
+// ОПЛАТА
+app.get("/pay", async (req, res) => {
+  try {
+    console.log("PAY HIT");
 
-  const amount = req.query.amount;
-  console.log("Amount:", amount);
+    const amount = Number(req.query.amount);
 
-  const orderId = Date.now().toString();
-  console.log("ORDER ID:", orderId);
+    const orderId = Date.now().toString();
+    console.log("ORDER ID:", orderId);
 
-  const url = `https://pay.raif.ru/ecom/pay?publicId=${process.env.RAIF_PUBLIC_ID}&amount=${amount}&orderId=${orderId}&successUrl=${process.env.BASE_URL}/success&failUrl=${process.env.BASE_URL}/fail`;
+    const body = {
+      publicId: process.env.RAIF_PUBLIC_ID,
+      amount: amount,
+      currency: "RUB",
+      orderId: orderId,
+      description: "Оплата",
+      successUrl: `${process.env.BASE_URL}/success`,
+      failUrl: `${process.env.BASE_URL}/fail`
+    };
 
-  console.log("REDIRECT URL:", url);
+    console.log("BODY SENT:", body);
 
-  res.redirect(url);
+    // ПОДПИСЬ (если не совпадает — смотри доку банка)
+    const signatureString = [
+      body.publicId,
+      body.amount,
+      body.currency,
+      body.orderId,
+      process.env.RAIF_SECRET_KEY
+    ].join(":");
+
+    const signature = crypto
+      .createHash("sha256")
+      .update(signatureString)
+      .digest("hex");
+
+    const response = await axios.post(
+      "https://pay.raif.ru/api/payment/v1/orders",
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Signature-SHA256": signature
+        }
+      }
+    );
+
+    console.log("RESPONSE DATA:", response.data);
+
+    res.redirect(response.data.paymentUrl);
+
+  } catch (err) {
+    console.error("PAY ERROR:", err.response?.data || err.message);
+    res.status(500).send("Ошибка оплаты");
+  }
 });
 
 
@@ -140,15 +180,4 @@ app.get("/admin", async (req, res) => {
     res.send(html);
 
   } catch (err) {
-    console.error("ADMIN ERROR:", err.message);
-    res.status(500).send("Ошибка");
-  }
-});
-
-
-// Запуск сервера
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
-});
+    console.
