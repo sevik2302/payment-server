@@ -43,13 +43,14 @@ app.get("/pay", async (req, res) => {
       successUrl: `${process.env.BASE_URL}/success`,
       failUrl: `${process.env.BASE_URL}/fail`
     };
-
+    console.log("BODY SENT:", body);
     const signature = crypto
       .createHmac("sha256", process.env.RAIF_SECRET_KEY)
       .update(JSON.stringify(body))
       .digest("hex");
 
     const response = await axios.post(
+      console.log("RESPONSE DATA:", response.data);
       "https://pay.raif.ru/api/payment/v1/orders",
       body,
       {
