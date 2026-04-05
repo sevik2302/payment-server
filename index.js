@@ -42,8 +42,8 @@ app.get("/pay", async (req, res) => {
     currency: "RUB",
     orderId,
     description: "Оплата",
-    successUrl: ${process.env.BASE_URL}/success,
-    failUrl: ${process.env.BASE_URL}/fail
+    successUrl: `${process.env.BASE_URL}/success`,
+    failUrl: `${process.env.BASE_URL}/fail`
   };
 
   const signature = crypto
