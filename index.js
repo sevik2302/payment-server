@@ -13,6 +13,8 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
+const PORT = process.env.PORT || 3000;
+
 // MongoDB
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("DB connected"))
@@ -24,12 +26,17 @@ app.get("/", (req, res) => {
 });
 
 
+// =======================
 // ОПЛАТА
+// =======================
 app.get("/pay", async (req, res) => {
   try {
     console.log("PAY HIT");
 
     const amount = Number(req.query.amount);
+    if (!amount) {
+      return res.status(400).send("No amount");
+    }
 
     const orderId = Date.now().toString();
     console.log("ORDER ID:", orderId);
@@ -46,7 +53,7 @@ app.get("/pay", async (req, res) => {
 
     console.log("BODY SENT:", body);
 
-    // ПОДПИСЬ (если не совпадает — смотри доку банка)
+    // ⚠️ ВАЖНО: подпись может быть другой по доке
     const signatureString = [
       body.publicId,
       body.amount,
@@ -60,6 +67,8 @@ app.get("/pay", async (req, res) => {
       .update(signatureString)
       .digest("hex");
 
+    console.log("SIGNATURE:", signature);
+
     const response = await axios.post(
       "https://pay.raif.ru/api/payment/v1/orders",
       body,
@@ -71,9 +80,16 @@ app.get("/pay", async (req, res) => {
       }
     );
 
-    console.log("RESPONSE DATA:", response.data);
+    console.log("RAIF RESPONSE:", response.data);
 
-    res.redirect(response.data.paymentUrl);
+    const paymentUrl = response.data.paymentUrl || response.data.url;
+
+    if (!paymentUrl) {
+      console.error("No paymentUrl in response!");
+      return res.status(500).send("Ошибка получения ссылки оплаты");
+    }
+
+    return res.redirect(paymentUrl);
 
   } catch (err) {
     console.error("PAY ERROR:", err.response?.data || err.message);
@@ -82,7 +98,9 @@ app.get("/pay", async (req, res) => {
 });
 
 
+// =======================
 // WEBHOOK
+// =======================
 app.post("/callback", async (req, res) => {
   try {
     const signature = req.headers["x-api-signature-sha256"];
@@ -92,47 +110,57 @@ app.post("/callback", async (req, res) => {
       .update(JSON.stringify(req.body))
       .digest("hex");
 
-    if (hash !== signature) return res.sendStatus(403);
+    if (hash !== signature) {
+      console.log("Invalid signature");
+      return res.sendStatus(403);
+    }
 
     const { orderId, status, amount } = req.body;
 
     const order = await Order.findOne({ orderId });
 
-    if (!order) return res.sendStatus(404);
+    if (!order) {
+      return res.sendStatus(404);
+    }
 
     if (status === "SUCCESS") {
       order.status = "paid";
 
+      // пример отправки чека
       if (!order.receiptSent) {
-        await axios.post(
-          "https://api.cloudkassir.ru/api/v1/receipt",
-          {
-            external_id: orderId,
-            receipt: {
-              items: [
-                {
-                  name: "Оплата",
-                  price: amount,
-                  quantity: 1,
-                  sum: amount,
-                  vat: "vat20"
-                }
-              ],
-              total: amount
+        try {
+          await axios.post(
+            "https://api.cloudkassir.ru/api/v1/receipt",
+            {
+              external_id: orderId,
+              receipt: {
+                items: [
+                  {
+                    name: "Оплата",
+                    price: amount,
+                    quantity: 1,
+                    sum: amount,
+                    vat: "vat20"
+                  }
+                ],
+                total: amount
+              },
+              customer: {
+                email: "client@test.ru"
+              }
             },
-            customer: {
-              email: "client@test.ru"
+            {
+              headers: {
+                "X-Auth": process.env.CLOUDKASSIR_PUBLIC_ID,
+                "X-Password": process.env.CLOUDKASSIR_API_KEY
+              }
             }
-          },
-          {
-            headers: {
-              "X-Auth": process.env.CLOUDKASSIR_PUBLIC_ID,
-              "X-Password": process.env.CLOUDKASSIR_API_KEY
-            }
-          }
-        );
+          );
 
-        order.receiptSent = true;
+          order.receiptSent = true;
+        } catch (e) {
+          console.error("Receipt error:", e.message);
+        }
       }
 
     } else {
@@ -145,47 +173,14 @@ app.post("/callback", async (req, res) => {
 
   } catch (err) {
     console.error("WEBHOOK ERROR:", err.message);
-    res.sendStatus(500);
+    res.status(500).send("Ошибка");
   }
 });
 
 
-// СТРАНИЦЫ
-app.get("/success", (req, res) => {
-  res.send("Оплата успешна");
-});
-
-app.get("/fail", (req, res) => {
-  res.send("Ошибка оплаты");
-});
-
-
-// АДМИНКА
-app.get("/admin", async (req, res) => {
-  try {
-    if (req.query.password !== process.env.ADMIN_PASSWORD) {
-      return res.send("Нет доступа");
-    }
-
-    const orders = await Order.find().sort({ createdAt: -1 });
-
-    let html = "<h1>Заказы</h1><table border='1'><tr><th>ID</th><th>Сумма</th><th>Статус</th></tr>";
-
-    orders.forEach(o => {
-      html += `<tr><td>${o.orderId}</td><td>${o.amount}</td><td>${o.status}</td></tr>`;
-    });
-
-    html += "</table>";
-
-    res.send(html);
-
-  } catch (err) {
-    console.error("ERROR:", err);
-  res.status(500).send("Ошибка");
-}
-});
-const PORT = process.env.PORT;
-
+// =======================
+// ЗАПУСК СЕРВЕРА
+// =======================
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on ${PORT}`);
 });
