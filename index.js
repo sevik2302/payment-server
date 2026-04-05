@@ -155,4 +155,8 @@ app.get("/admin", async (req, res) => {
   res.send(html);
 });
 
-app.listen(3000, () => console.log("Server started"));
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
+});
