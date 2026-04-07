@@ -28,7 +28,7 @@ app.get("/pay", async (req, res) => {
   try {
     const amountRub = Number(req.query.amount);
 
-    if (!amountRub || amountRub <= 0) {
+    if (!amountRub || isNaN(amountRub) || amountRub <= 0) {
       return res.send("Неверная сумма");
     }
 
@@ -45,7 +45,7 @@ app.get("/pay", async (req, res) => {
     const response = await axios.post(
       `https://pay.raif.ru/payments/v1/payform`,
       {
-        publicid: process.env.RAIF_PUBLIC_ID,
+        publiciId: process.env.RAIF_PUBLIC_ID,
         id: orderId,
         amount: amount,
         comment: "Оплата",
@@ -53,11 +53,6 @@ app.get("/pay", async (req, res) => {
         returnUrls: {
           successUrl: "https://payment-server-flye.onrender.com/success",
           failUrl: "https://payment-server-flye.onrender.com/fail"
-        }
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
         }
       }
     );
