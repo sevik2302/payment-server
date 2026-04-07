@@ -1,27 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8">
   <title>Оплата</title>
 </head>
 <body>
+  <h1>Оплата услуги</h1>
 
-<h2>Оплата</h2>
+  <form id="payForm">
+    <input type="number" id="amount" placeholder="Введите сумму (₽)" required />
+    <button type="submit">Оплатить</button>
+  </form>
 
-<input type="number" id="amount" placeholder="Введите сумму в рублях">
-<button onclick="pay()">Оплатить</button>
+  <script>
+    const form = document.getElementById("payForm");
 
-<script>
-  function pay() {
-    const amount = document.getElementById("amount").value;
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    if (!amount || amount <= 0) {
-      alert("Введите сумму");
-      return;
-    }
+      const amount = document.getElementById("amount").value;
 
-    window.location.href = `/pay?amount=${amount}`;
-  }
-</script>
+      if (!amount || amount <= 0) {
+        alert("Введите корректную сумму");
+        return;
+      }
 
+      window.location.href = `/pay?amount=${amount}`;
+    });
+  </script>
 </body>
 </html>
