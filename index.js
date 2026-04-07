@@ -49,7 +49,7 @@ app.get("/pay", async (req, res) => {
     });
 
     const response = await axios.post(
-      https://pay.raif.ru/api/payments/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders/payment-link,
+      `https://pay.raif.ru/api/payments/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders/payment-link`,
       {
         id: orderId,
         amount: amount,
@@ -63,7 +63,7 @@ app.get("/pay", async (req, res) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: Bearer ${process.env.RAIF_SECRET_KEY}
+          Authorization: `Bearer ${process.env.RAIF_SECRET_KEY}`
         }
       }
     );
@@ -162,7 +162,7 @@ app.get("/admin", async (req, res) => {
     let html = "<h1>Заказы</h1><table border='1'><tr><th>ID</th><th>Сумма</th><th>Статус</th></tr>";
 
     orders.forEach(o => {
-      html += <tr><td>${o.orderId}</td><td>${o.amount}</td><td>${o.status}</td></tr>;
+      html += `<tr><td>${o.orderId}</td><td>${o.amount}</td><td>${o.status}</td></tr>`;
     });
 
     html += "</table>";
