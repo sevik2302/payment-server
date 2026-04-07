@@ -43,7 +43,7 @@ app.get("/pay", async (req, res) => {
     });
 
     const response = await axios.post(
-      `https://pay.raif.ru/payments/v1/payform`,
+      `https://pay.raif.ru/api/payments/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders/payment-link`,
       {
         publicId: process.env.RAIF_PUBLIC_ID,
         id: orderId,
