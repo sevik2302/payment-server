@@ -1,16 +1,25 @@
 const mongoose = require("mongoose");
 
-const orderSchema = new mongoose.Schema({
-  orderId: String,
-  amount: Number,
-  status: {
-    type: String,
-    default: "pending"
+const orderSchema = new mongoose.Schema(
+  {
+    orderId: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    amount: {
+      type: Number,
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ["pending", "paid", "failed"],
+      default: "pending"
+    }
   },
-  receiptSent: {
-    type: Boolean,
-    default: false
+  {
+    timestamps: true
   }
-}, { timestamps: true });
+);
 
 module.exports = mongoose.model("Order", orderSchema);
