@@ -38,7 +38,7 @@ app.get("/pay", async (req, res) => {
       return res.send("Неверная сумма");
     }
 
-    const amount = Math.round(amountRub * 100);
+    const amount = Math.round(Number(amountRub));
     const orderId = Date.now().toString();
 
     // сохраняем заказ
