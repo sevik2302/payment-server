@@ -50,8 +50,8 @@ app.get("/pay", async (req, res) => {
         comment: "Оплата",
         paymentDetails: "Оплата услуги",
         returnUrls: {
-          successUrl: `${process.env.BASE_URL}/success`,
-          failUrl: `${process.env.BASE_URL}/fail`
+          successUrl: "https://google.com",
+          failUrl: "https://google.com"
         }
       },
       {
@@ -65,7 +65,9 @@ app.get("/pay", async (req, res) => {
     res.redirect(response.data.payformUrl);
 
   } catch (err) {
-    console.error("PAY ERROR:", err.response?.data || err.message);
+    console.log("STATUS:", err.response?.status);
+console.log("DATA:", err.response?.data);
+console.log("ERROR:", err.message);
     res.status(500).send("Ошибка оплаты");
   }
 });
