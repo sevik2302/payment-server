@@ -53,8 +53,8 @@ app.get("/pay", async (req, res) => {
       {
         id: orderId,
         amount: amount,
-        comment: "Оплата",
-        paymentDetails: "Оплата услуги",
+        comment: "Оплата услуги AEY Digital Services",
+        paymentDetails: "Предоставление доступа к онлайн-сервису",
         returnUrls: {
           successUrl: "https://payment-server-flye.onrender.com/success",
           failUrl: "https://payment-server-flye.onrender.com/fail"
