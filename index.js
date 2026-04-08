@@ -43,7 +43,7 @@ app.get("/pay", async (req, res) => {
     });
 
     const response = await axios.post(
-      https://pay.raif.ru/api/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders,
+      `https://pay.raif.ru/api/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders`,
       {
         id: orderId,
         amount: amount,
@@ -51,13 +51,13 @@ app.get("/pay", async (req, res) => {
         paymentDetails: "Оплата доступа к сервису",
         locale: "RU",
         returnUrls: {
-          successUrl: "https://your-site.com/success",
-          failUrl: "https://your-site.com/fail"
+          successUrl: "https://payment-server-flye.onrender.com/success",
+          failUrl: "https://payment-server-flye.onrender.com/fail"
         }
       },
       {
         headers: {
-          Authorization: Bearer ${process.env.RAIF_SECRET_KEY},
+          Authorization: `Bearer ${process.env.RAIF_SECRET_KEY}`,
           "Content-Type": "application/json"
         }
       }
