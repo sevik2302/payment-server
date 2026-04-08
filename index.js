@@ -3,8 +3,6 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const axios = require("axios");
-const crypto = require("crypto");
-const path = require("path");
 
 const Order = require("./models/Order");
 
@@ -31,7 +29,6 @@ app.get("/pay", async (req, res) => {
     const phone = req.query.phone || null;
 
     const amount = amountRub;
-
     const orderId = Date.now().toString();
 
     await Order.create({
@@ -76,53 +73,33 @@ app.get("/pay", async (req, res) => {
 // ==================
 app.post("/webhook", async (req, res) => {
   console.log("WEBHOOK HIT");
-  if (!req.body) {
+
+  if (!req.body || Object.keys(req.body).length === 0) {
     console.log("EMPTY WEBHOOK BODY");
     return res.sendStatus(400);
   }
 
   console.log("WEBHOOK BODY:", req.body);
-  
+
   try {
     const data = req.body;
-    const signature = req.headers["x-api-signature-sha256"];
 
-    const stringToSign = [
-      data.amount,
-      data.publicId,
-      data.order?.id,
-      data.status?.value,
-      data.status?.date
-    ].join("|");
+    const orderId = data.order;
+    const value = data.paymentStatus;
 
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAIF_SECRET_KEY)
-      .update(stringToSign)
-      .digest("hex");
+    const order = await Order.findOne({ orderId: orderId });
 
-    if (signature !== expectedSignature) {
-      return res.sendStatus(403);
-    }
-
-    const { id } = data.order;
-    const { value } = data.status;
-
-    const order = await Order.findOne({ orderId: id });
+    console.log("ORDER FOUND:", order);
 
     if (!order) return res.sendStatus(404);
 
     if (value === "SUCCESS") {
       console.log("WEBHOOK SUCCESS");
-      
+
       order.status = "paid";
 
       console.log("TRY SEND CLOUDKASSIR");
-      
-      
 
-      // ==================
-      // CLOUDKASSIR
-      // ==================
       try {
         await axios.post(
           "https://api.cloudkassir.ru/api/v1/receipts",
@@ -133,14 +110,14 @@ app.post("/webhook", async (req, res) => {
               Items: [
                 {
                   label: "Доступ к онлайн-сервису",
-                  price: order.amount / 100,
+                  price: order.amount,
                   quantity: 1,
-                  amount: order.amount / 100,
+                  amount: order.amount,
                   vat: 0
                 }
               ],
               taxationSystem: 2,
-              email: order.email || undefined,
+              email: order.email || "test@test.com",
               phone: order.phone || undefined
             }
           },
@@ -155,7 +132,7 @@ app.post("/webhook", async (req, res) => {
         console.log("CLOUDKASSIR SENT");
 
       } catch (e) {
-        console.error("CLOUDKASSIR ERROR", e.response?.data || e.message);
+        console.error("CLOUDKASSIR ERROR:", e.response?.data || e.message);
       }
 
     } else {
@@ -167,7 +144,7 @@ app.post("/webhook", async (req, res) => {
     res.sendStatus(200);
 
   } catch (err) {
-    console.error(err);
+    console.error("WEBHOOK ERROR:", err);
     res.sendStatus(500);
   }
 });
