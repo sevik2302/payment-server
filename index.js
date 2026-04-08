@@ -76,8 +76,15 @@ app.get("/pay", async (req, res) => {
 // ==================
 app.post("/webhook", async (req, res) => {
   console.log("WEBHOOK HIT");
+  if (!req.body) {
+    console.log("EMPTY WEBHOOK BODY");
+    return res.sendStatus(400);
+  }
+
+  console.log("WEBHOOK BODY:", req.body);
+  
   try {
-    const data = req.body.data;
+    const data = req.body;
     const signature = req.headers["x-api-signature-sha256"];
 
     const stringToSign = [
