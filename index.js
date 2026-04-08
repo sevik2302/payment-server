@@ -136,7 +136,7 @@ app.post("/webhook", async (req, res) => {
               ],
               taxationSystem: 7,
               email: order.email,
-              phone: order.phone
+              phone: order.phone || undefined
             }
           },
           {
