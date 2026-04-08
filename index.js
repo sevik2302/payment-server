@@ -119,6 +119,7 @@ app.post("/webhook", async (req, res) => {
           "https://api.cloudpayments.ru/kkt/receipt",
           {
             Inn: process.env.CLOUDKASSIR_INN,
+            AccountId: order.email,
             Type: "Income",
             CustomerReceipt: {
               Items: [
