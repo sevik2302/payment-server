@@ -131,7 +131,7 @@ app.post("/webhook", async (req, res) => {
                   vat: "none",
                   method: 4,
                   object: 4,
-                  measurementUnit: "услуга"
+                  measurementUnit: "шт"
                 }
               ],
               taxationSystem: 7,
