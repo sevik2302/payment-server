@@ -111,7 +111,7 @@ app.post("/webhook", async (req, res) => {
       // ==================
       try {
         await axios.post(
-          "https://api.cloudkassir.ru/kkt/receipt",
+          "https://api.cloudkassir.ru/api/v1/receipts",
           {
             Inn: process.env.CLOUDKASSIR_INN,
             Type: "Income",
