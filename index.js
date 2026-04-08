@@ -108,9 +108,6 @@ app.post("/webhook", async (req, res) => {
 
       order.status = "paid";
 
-      console.log("TRY SEND CLOUDKASSIR");
-      console.log("SENDING EMAIL TO CLOUDKASSIR:", order.email;
-
       // ✅ случайное название
       const randomLabel = labels[Math.floor(Math.random() * labels.length)];
 
