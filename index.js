@@ -112,10 +112,16 @@ app.post("/webhook", async (req, res) => {
                   price: order.amount,
                   quantity: 1,
                   amount: order.amount,
-                  vat: 0
+                  vat: {
+                    type: "none"
+                },
+
+                  method: 4,
+                  object: 4,
+                  measurementUnit: "шт"
                 }
               ],
-              taxationSystem: 2,
+              taxationSystem: 7,
               email: order.email || "test@test.com",
               phone: order.phone || null
             }
