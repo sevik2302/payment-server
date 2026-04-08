@@ -28,12 +28,11 @@ app.get("/pay", async (req, res) => {
     const email = req.query.email || null;
     const phone = req.query.phone || null;
 
-    const amount = amountRub;
     const orderId = Date.now().toString();
 
     await Order.create({
       orderId,
-      amount,
+      amount: amountRub,
       status: "pending",
       email,
       phone
@@ -43,7 +42,7 @@ app.get("/pay", async (req, res) => {
       `https://pay.raif.ru/api/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders`,
       {
         id: orderId,
-        amount: amount,
+        amount: amountRub,
         comment: "Оплата доступа к сервису",
         paymentDetails: "Оплата доступа к сервису",
         locale: "RU",
@@ -60,10 +59,10 @@ app.get("/pay", async (req, res) => {
       }
     );
 
-    res.redirect(response.data.payformUrl);
+    return res.redirect(response.data.payformUrl);
 
   } catch (err) {
-    console.error(err.response?.data || err.message);
+    console.error("PAY ERROR:", err.response?.data || err.message);
     res.status(500).send("Ошибка оплаты");
   }
 });
@@ -85,24 +84,25 @@ app.post("/webhook", async (req, res) => {
     const data = req.body;
 
     const orderId = data.order;
-    const value = data.paymentStatus;
+    const status = data.paymentStatus;
 
-    const order = await Order.findOne({ orderId: orderId });
+    const order = await Order.findOne({ orderId });
 
     console.log("ORDER FOUND:", order);
 
     if (!order) return res.sendStatus(404);
 
-    if (value === "SUCCESS") {
-      console.log("WEBHOOK SUCCESS");
+    if (status === "SUCCESS") {
+      console.log("PAYMENT SUCCESS");
 
       order.status = "paid";
 
       console.log("TRY SEND CLOUDKASSIR");
 
       try {
-        await axios.post(
-          "https://api.cloudkassir.ru/api/v1/receipts",
+        // ⚠️ ВАЖНО: сюда вставь ПРАВИЛЬНЫЙ URL из документации CloudKassir
+        const response = await axios.post(
+          process.env.CLOUDKASSIR_URL, // ← ВАЖНО
           {
             Inn: process.env.CLOUDKASSIR_INN,
             Type: "Income",
@@ -129,6 +129,7 @@ app.post("/webhook", async (req, res) => {
           }
         );
 
+        console.log("CLOUDKASSIR RESPONSE:", response.data);
         console.log("CLOUDKASSIR SENT");
 
       } catch (e) {
