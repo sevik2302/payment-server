@@ -20,29 +20,14 @@ mongoose.connect(process.env.MONGO_URL)
   .catch(err => console.error(err));
 
 // ==================
-// RANDOM LABELS
-// ==================
-const labels = [
-  "Доступ к цифровому сервису",
-  "Услуги по предоставлению цифрового контента",
-  "Оплата доступа к платформе",
-  "Доступ к программному обеспечению",
-  "Предоставление доступа к сервису"
-];
-
-// ==================
-// PAY (Raiffeisen)
+// PAY
 // ==================
 app.get("/pay", async (req, res) => {
   try {
     const amountRub = Number(req.query.amount);
-    const email = req.query.email;
-
-    if (!email) {
-      return res.status(400).send("Email обязателен");
-    }
-
+    const email = req.query.email || null;
     const phone = req.query.phone || null;
+
     const orderId = Date.now().toString();
 
     await Order.create({
@@ -107,14 +92,6 @@ app.post("/webhook", async (req, res) => {
 
       order.status = "paid";
 
-      const randomLabel = labels[Math.floor(Math.random() * labels.length)];
-
-      console.log("TRY SEND CLOUDKASSIR");
-      console.log("ORDER EMAIL:", order.email);
-
-      // ==================
-      // ЧЕК (ВАЖНО!)
-      // ==================
       try {
         const response = await axios.post(
           "https://api.cloudpayments.ru/kkt/receipt",
@@ -124,11 +101,11 @@ app.post("/webhook", async (req, res) => {
             CustomerReceipt: {
               Items: [
                 {
-                  label: randomLabel,
+                  label: "Цифровая услуга",
                   price: Number(order.amount),
                   quantity: 1,
                   amount: Number(order.amount),
-                  vat: "0"
+                  vat: "none"
                 }
               ],
               taxationSystem: 7,
