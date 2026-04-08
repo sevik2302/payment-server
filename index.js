@@ -100,9 +100,8 @@ app.post("/webhook", async (req, res) => {
       console.log("TRY SEND CLOUDKASSIR");
 
       try {
-       console.log("CLOUDKASSIR_URL:", process.env.CLOUDKASSIR_URL); // ⚠️ ВАЖНО: сюда вставь ПРАВИЛЬНЫЙ URL из документации CloudKassir
         const response = await axios.post(
-          process.env.CLOUDKASSIR_URL, // ← ВАЖНО
+          "https://api.cloudpayments.ru/kkt/receipt",
           {
             Inn: process.env.CLOUDKASSIR_INN,
             Type: "Income",
@@ -118,13 +117,13 @@ app.post("/webhook", async (req, res) => {
               ],
               taxationSystem: 2,
               email: order.email || "test@test.com",
-              phone: order.phone || undefined
+              phone: order.phone || null
             }
           },
           {
             auth: {
-              username: process.env.CLOUDKASSIR_PUBLIC_ID,
-              password: process.env.CLOUDKASSIR_SECRET_KEY
+              username: process.env.CLOUDPAYMENTS_PUBLIC_ID,
+              password: process.env.CLOUDPAYMENTS_API_SECRET
             }
           }
         );
