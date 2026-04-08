@@ -100,7 +100,7 @@ app.post("/webhook", async (req, res) => {
       console.log("TRY SEND CLOUDKASSIR");
 
       try {
-        // ⚠️ ВАЖНО: сюда вставь ПРАВИЛЬНЫЙ URL из документации CloudKassir
+       console.log("CLOUDKASSIR_URL:", process.env.CLOUDKASSIR_URL); // ⚠️ ВАЖНО: сюда вставь ПРАВИЛЬНЫЙ URL из документации CloudKassir
         const response = await axios.post(
           process.env.CLOUDKASSIR_URL, // ← ВАЖНО
           {
