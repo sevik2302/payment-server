@@ -20,14 +20,30 @@ mongoose.connect(process.env.MONGO_URL)
   .catch(err => console.error(err));
 
 // ==================
-// PAY (создание платежа)
+// RANDOM LABELS
+// ==================
+const labels = [
+  "Доступ к цифровому сервису",
+  "Услуги по предоставлению цифрового контента",
+  "Оплата доступа к платформе",
+  "Доступ к программному обеспечению",
+  "Предоставление доступа к сервису"
+];
+
+// ==================
+// PAY
 // ==================
 app.get("/pay", async (req, res) => {
   try {
     const amountRub = Number(req.query.amount);
-    const email = req.query.email || null;
-    const phone = req.query.phone || null;
+    const email = req.query.email;
 
+    // ✅ EMAIL ОБЯЗАТЕЛЕН
+    if (!email) {
+      return res.status(400).send("Email обязателен");
+    }
+
+    const phone = req.query.phone || null;
     const orderId = Date.now().toString();
 
     await Order.create({
@@ -74,11 +90,8 @@ app.post("/webhook", async (req, res) => {
   console.log("WEBHOOK HIT");
 
   if (!req.body || Object.keys(req.body).length === 0) {
-    console.log("EMPTY WEBHOOK BODY");
     return res.sendStatus(400);
   }
-
-  console.log("WEBHOOK BODY:", req.body);
 
   try {
     const data = req.body;
@@ -88,8 +101,6 @@ app.post("/webhook", async (req, res) => {
 
     const order = await Order.findOne({ orderId });
 
-    console.log("ORDER FOUND:", order);
-
     if (!order) return res.sendStatus(404);
 
     if (status === "SUCCESS") {
@@ -97,7 +108,8 @@ app.post("/webhook", async (req, res) => {
 
       order.status = "paid";
 
-      console.log("TRY SEND CLOUDKASSIR");
+      // ✅ случайное название
+      const randomLabel = labels[Math.floor(Math.random() * labels.length)];
 
       try {
         const response = await axios.post(
@@ -108,23 +120,21 @@ app.post("/webhook", async (req, res) => {
             CustomerReceipt: {
               Items: [
                 {
-                  label: "Доступ к онлайн-сервису",
+                  label: randomLabel,
                   price: order.amount,
                   quantity: 1,
                   amount: order.amount,
-                  
                   vat: {
                     type: "none"
-                },
-
+                  },
                   method: 4,
                   object: 4,
-                  measurementUnit: "шт"
+                  measurementUnit: "услуга"
                 }
               ],
               taxationSystem: 7,
-              email: order.email || "test@test.com",
-              phone: order.phone || null
+              email: order.email,
+              phone: order.phone
             }
           },
           {
@@ -136,7 +146,6 @@ app.post("/webhook", async (req, res) => {
         );
 
         console.log("CLOUDKASSIR RESPONSE:", response.data);
-        console.log("CLOUDKASSIR SENT");
 
       } catch (e) {
         console.error("CLOUDKASSIR ERROR:", e.response?.data || e.message);
