@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGO_URL)
   .catch(err => console.error(err));
 
 // ==================
-// PAY
+// PAY (создание платежа)
 // ==================
 app.get("/pay", async (req, res) => {
   try {
@@ -74,8 +74,11 @@ app.post("/webhook", async (req, res) => {
   console.log("WEBHOOK HIT");
 
   if (!req.body || Object.keys(req.body).length === 0) {
+    console.log("EMPTY WEBHOOK BODY");
     return res.sendStatus(400);
   }
+
+  console.log("WEBHOOK BODY:", req.body);
 
   try {
     const data = req.body;
@@ -85,12 +88,16 @@ app.post("/webhook", async (req, res) => {
 
     const order = await Order.findOne({ orderId });
 
+    console.log("ORDER FOUND:", order);
+
     if (!order) return res.sendStatus(404);
 
     if (status === "SUCCESS") {
       console.log("PAYMENT SUCCESS");
 
       order.status = "paid";
+
+      console.log("TRY SEND CLOUDKASSIR");
 
       try {
         const response = await axios.post(
@@ -101,30 +108,28 @@ app.post("/webhook", async (req, res) => {
             CustomerReceipt: {
               Items: [
                 {
-                  label: "Цифровая услуга",
-                  price: Number(order.amount),
+                  label: "Доступ к онлайн-сервису",
+                  price: order.amount,
                   quantity: 1,
-                  amount: Number(order.amount),
-                  vat: "none"
+                  amount: order.amount,
+                  vat: 0
                 }
               ],
-              taxationSystem: 7,
-              email: order.email,
-              phone: order.phone || undefined
+              taxationSystem: 2,
+              email: order.email || "test@test.com",
+              phone: order.phone || null
             }
           },
           {
             auth: {
               username: process.env.CLOUDPAYMENTS_PUBLIC_ID,
               password: process.env.CLOUDPAYMENTS_API_SECRET
-            },
-            headers: {
-              "Content-Type": "application/json"
             }
           }
         );
 
         console.log("CLOUDKASSIR RESPONSE:", response.data);
+        console.log("CLOUDKASSIR SENT");
 
       } catch (e) {
         console.error("CLOUDKASSIR ERROR:", e.response?.data || e.message);
