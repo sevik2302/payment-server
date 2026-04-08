@@ -108,9 +108,15 @@ app.post("/webhook", async (req, res) => {
 
       order.status = "paid";
 
+      console.log("TRY SEND CLOUDKASSIR");
+      console.log("SENDING EMAIL TO CLOUDKASSIR:", order.email;
+
       // ✅ случайное название
       const randomLabel = labels[Math.floor(Math.random() * labels.length)];
 
+     console.log("TRY SEND CLOUDKASSIR");
+      console.log("ORDER EMAIL:", order.email);
+      
       try {
         const response = await axios.post(
           "https://api.cloudpayments.ru/kkt/receipt",
