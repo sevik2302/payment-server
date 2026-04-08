@@ -75,6 +75,7 @@ app.get("/pay", async (req, res) => {
 // WEBHOOK
 // ==================
 app.post("/webhook", async (req, res) => {
+  console.log("WEBHOOK HIT");
   try {
     const data = req.body.data;
     const signature = req.headers["x-api-signature-sha256"];
@@ -104,7 +105,21 @@ app.post("/webhook", async (req, res) => {
     if (!order) return res.sendStatus(404);
 
     if (value === "SUCCESS") {
+      console.log("WEBHOOK SUCCESS");
+      
       order.status = "paid";
+
+      console.log("TRY SEND CLOUDKASSIR");
+      
+       try {
+    await axios.post(...);
+
+    console.log("CLOUDKASSIR SENT");
+
+  } catch (e) {
+    console.error("CLOUDKASSIR ERROR:", e.response?.data || e.message);
+  }
+}
 
       // ==================
       // CLOUDKASSIR
