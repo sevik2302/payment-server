@@ -30,7 +30,7 @@ app.get("/pay", async (req, res) => {
     const email = req.query.email || null;
     const phone = req.query.phone || null;
 
-    const amount = amountRub * 100;
+    const amount = amountRub;
 
     const orderId = Date.now().toString();
 
