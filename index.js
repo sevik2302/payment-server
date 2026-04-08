@@ -111,15 +111,7 @@ app.post("/webhook", async (req, res) => {
 
       console.log("TRY SEND CLOUDKASSIR");
       
-       try {
-    await axios.post(...);
-
-    console.log("CLOUDKASSIR SENT");
-
-  } catch (e) {
-    console.error("CLOUDKASSIR ERROR:", e.response?.data || e.message);
-  }
-}
+      
 
       // ==================
       // CLOUDKASSIR
@@ -153,10 +145,10 @@ app.post("/webhook", async (req, res) => {
           }
         );
 
-        console.log("ЧЕК ОТПРАВЛЕН");
+        console.log("CLOUDKASSIR SENT");
 
       } catch (e) {
-        console.error("Ошибка CloudKassir:", e.response?.data || e.message);
+        console.error("CLOUDKASSIR ERROR", e.response?.data || e.message);
       }
 
     } else {
