@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const axios = require("axios");
 const crypto = require("crypto");
+const path = require("path");
 
 const Order = require("./models/Order");
 
@@ -14,86 +15,69 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // ==================
-// DB
+// MONGO
 // ==================
 mongoose.connect(process.env.MONGO_URL)
-  .then(() => console.log("DB connected"))
-  .catch(err => console.log(err));
+  .then(() => console.log("Mongo connected"))
+  .catch(err => console.error(err));
 
 // ==================
-// Главная
-// ==================
-app.get("/", (req, res) => {
-  res.send("API работает");
-});
-
-// ==================
-// 💳 СОЗДАНИЕ ОПЛАТЫ
+// PAY (создание платежа)
 // ==================
 app.get("/pay", async (req, res) => {
   try {
     const amountRub = Number(req.query.amount);
+    const email = req.query.email || null;
+    const phone = req.query.phone || null;
 
-    if (!amountRub || amountRub <= 0) {
-      return res.send("Неверная сумма");
-    }
+    const amount = amountRub * 100;
 
-    const amount = Math.round(Number(amountRub));
     const orderId = Date.now().toString();
 
-    // сохраняем заказ
     await Order.create({
       orderId,
       amount,
-      status: "pending"
+      status: "pending",
+      email,
+      phone
     });
 
     const response = await axios.post(
-      `https://pay.raif.ru/api/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders`,
+      https://pay.raif.ru/api/v1/merchants/${process.env.RAIF_PUBLIC_ID}/orders,
       {
         id: orderId,
         amount: amount,
-        comment: "Оплата услуги AEY Digital Services",
-        paymentDetails: "Предоставление доступа к онлайн-сервису",
+        comment: "Оплата доступа к сервису",
+        paymentDetails: "Оплата доступа к сервису",
+        locale: "RU",
         returnUrls: {
-          successUrl: "https://payment-server-flye.onrender.com/success",
-          failUrl: "https://payment-server-flye.onrender.com/fail"
+          successUrl: "https://your-site.com/success",
+          failUrl: "https://your-site.com/fail"
         }
       },
       {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.RAIF_SECRET_KEY}`
+          Authorization: Bearer ${process.env.RAIF_SECRET_KEY},
+          "Content-Type": "application/json"
         }
       }
     );
 
-    const paymentUrl = response.data.payformUrl || response.data.paymentUrl;
-
-    if (!paymentUrl) {
-      console.log("FULL RESPONSE:", response.data);
-      return res.status(500).send("Не удалось получить ссылку оплаты");
-    }
-
-    res.redirect(paymentUrl);
+    res.redirect(response.data.payformUrl);
 
   } catch (err) {
-    console.log("STATUS:", err.response?.status);
-    console.log("DATA:", err.response?.data);
-    console.log("ERROR:", err.message);
-
+    console.error(err.response?.data || err.message);
     res.status(500).send("Ошибка оплаты");
   }
 });
 
 // ==================
-// 🔔 WEBHOOK
+// WEBHOOK
 // ==================
 app.post("/webhook", async (req, res) => {
   try {
+    const data = req.body.data;
     const signature = req.headers["x-api-signature-sha256"];
-
-    const data = req.body.data || req.body;
 
     const stringToSign = [
       data.amount,
@@ -121,62 +105,62 @@ app.post("/webhook", async (req, res) => {
 
     if (value === "SUCCESS") {
       order.status = "paid";
+
+      // ==================
+      // CLOUDKASSIR
+      // ==================
+      try {
+        await axios.post(
+          "https://api.cloudkassir.ru/kkt/receipt",
+          {
+            Inn: process.env.CLOUDKASSIR_INN,
+            Type: "Income",
+            CustomerReceipt: {
+              Items: [
+                {
+                  label: "Доступ к онлайн-сервису",
+                  price: order.amount / 100,
+                  quantity: 1,
+                  amount: order.amount / 100,
+                  vat: 0
+                }
+              ],
+              taxationSystem: 2,
+              email: order.email || undefined,
+              phone: order.phone || undefined
+            }
+          },
+          {
+            auth: {
+              username: process.env.CLOUDKASSIR_PUBLIC_ID,
+              password: process.env.CLOUDKASSIR_SECRET_KEY
+            }
+          }
+        );
+
+        console.log("ЧЕК ОТПРАВЛЕН");
+
+      } catch (e) {
+        console.error("Ошибка CloudKassir:", e.response?.data || e.message);
+      }
+
     } else {
       order.status = "failed";
     }
 
     await order.save();
 
-    console.log("PAYMENT UPDATED:", id, value);
-
     res.sendStatus(200);
 
   } catch (err) {
-    console.error("WEBHOOK ERROR:", err.message);
+    console.error(err);
     res.sendStatus(500);
-  }
-});
-
-// ==================
-// Страницы
-// ==================
-app.get("/success", (req, res) => {
-  res.send("Оплата успешна");
-});
-
-app.get("/fail", (req, res) => {
-  res.send("Ошибка оплаты");
-});
-
-// ==================
-// Админка
-// ==================
-app.get("/admin", async (req, res) => {
-  try {
-    if (req.query.password !== process.env.ADMIN_PASSWORD) {
-      return res.send("Нет доступа");
-    }
-
-    const orders = await Order.find().sort({ createdAt: -1 });
-
-    let html = "<h1>Заказы</h1><table border='1'><tr><th>ID</th><th>Сумма</th><th>Статус</th></tr>";
-
-    orders.forEach(o => {
-      html += `<tr><td>${o.orderId}</td><td>${o.amount}</td><td>${o.status}</td></tr>`;
-    });
-
-    html += "</table>";
-
-    res.send(html);
-
-  } catch (err) {
-    res.status(500).send("Ошибка");
   }
 });
 
 // ==================
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
