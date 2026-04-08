@@ -128,7 +128,7 @@ app.post("/webhook", async (req, res) => {
                   price: Number(order.amount),
                   quantity: 1,
                   amount: Number(order.amount),
-                  vat: "none"
+                  vat: "0"
                 }
               ],
               taxationSystem: 7,
