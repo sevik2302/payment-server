@@ -31,14 +31,13 @@ const labels = [
 ];
 
 // ==================
-// PAY
+// PAY (Raiffeisen)
 // ==================
 app.get("/pay", async (req, res) => {
   try {
     const amountRub = Number(req.query.amount);
     const email = req.query.email;
 
-    // ✅ EMAIL ОБЯЗАТЕЛЕН
     if (!email) {
       return res.status(400).send("Email обязателен");
     }
@@ -108,30 +107,28 @@ app.post("/webhook", async (req, res) => {
 
       order.status = "paid";
 
-      // ✅ случайное название
       const randomLabel = labels[Math.floor(Math.random() * labels.length)];
 
-     console.log("TRY SEND CLOUDKASSIR");
+      console.log("TRY SEND CLOUDKASSIR");
       console.log("ORDER EMAIL:", order.email);
-      
+
+      // ==================
+      // ЧЕК (ВАЖНО!)
+      // ==================
       try {
         const response = await axios.post(
           "https://api.cloudpayments.ru/kkt/receipt",
           {
             Inn: process.env.CLOUDKASSIR_INN,
-            AccountId: order.email,
             Type: "Income",
             CustomerReceipt: {
               Items: [
                 {
                   label: randomLabel,
-                  price: order.amount,
+                  price: Number(order.amount),
                   quantity: 1,
-                  amount: order.amount,
-                  vat: "none",
-                  method: 4,
-                  object: 4,
-                  measurementUnit: "шт"
+                  amount: Number(order.amount),
+                  vat: "none"
                 }
               ],
               taxationSystem: 7,
@@ -143,6 +140,9 @@ app.post("/webhook", async (req, res) => {
             auth: {
               username: process.env.CLOUDPAYMENTS_PUBLIC_ID,
               password: process.env.CLOUDPAYMENTS_API_SECRET
+            },
+            headers: {
+              "Content-Type": "application/json"
             }
           }
         );
