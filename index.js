@@ -47,8 +47,8 @@ app.get("/pay", async (req, res) => {
         paymentDetails: "Оплата доступа к сервису",
         locale: "RU",
         returnUrls: {
-          successUrl: "https://payment-server-flye.onrender.com/success",
-          failUrl: "https://payment-server-flye.onrender.com/fail"
+          successUrl: `${process.env.BASE_URL}/success`,
+          failUrl: `${process.env.BASE_URL}/fail`
         }
       },
       {
@@ -149,6 +149,8 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
+// ==================
+// SERVER
 // ==================
 const PORT = process.env.PORT || 3000;
 
