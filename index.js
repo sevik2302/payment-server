@@ -59,7 +59,20 @@ app.get("/pay", async (req, res) => {
       }
     );
 
-    return res.redirect(response.data.payformUrl);
+   return res.send(`
+  <html>
+    <head><meta charset="UTF-8"></head>
+    <body>
+      <p>Перенаправляем на оплату...</p>
+      <script>
+        window.location.href = "${response.data.payformUrl}";
+      </script>
+      <a href="${response.data.payformUrl}">
+        Если не открылось — нажмите сюда
+      </a>
+    </body>
+  </html>
+`);
 
   } catch (err) {
     console.error("PAY ERROR:", err.response?.data || err.message);
