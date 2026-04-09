@@ -11,11 +11,39 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-  background: radial-gradient(circle at top, #0f172a, #020617);
+
+  /* анимированный фон */
+  background: linear-gradient(120deg, #020617, #0f172a, #020617);
+  background-size: 300% 300%;
+  animation: bgMove 12s ease infinite;
+
   color: #fff;
+  overflow: hidden;
 }
 
-/* CANVAS */
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* glow */
+.glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(34,197,94,0.25), transparent 70%);
+  top: -150px;
+  left: -150px;
+  animation: glowMove 8s ease-in-out infinite alternate;
+}
+
+@keyframes glowMove {
+  from { transform: translate(0,0); }
+  to { transform: translate(180px,120px); }
+}
+
+/* canvas */
 #bg {
   position: fixed;
   top: 0;
@@ -23,7 +51,7 @@ body {
   z-index: -1;
 }
 
-/* HEADER */
+/* header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -31,27 +59,41 @@ body {
   font-size: 13px;
   color: #94a3b8;
 }
+
 .header strong { color: #fff; }
 
-/* LAYOUT */
+/* container */
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 70px);
+  height: 100vh;
 }
 
-/* CARD */
+/* card */
 .card {
   width: 420px;
   background: rgba(17,24,39,0.95);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   border-radius: 18px;
   padding: 40px;
   box-shadow: 0 40px 120px rgba(0,0,0,0.9);
+
+  animation: fadeInUp 0.8s ease;
 }
 
-/* BADGE */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* badge */
 .badge {
   display: inline-block;
   padding: 6px 10px;
@@ -62,16 +104,22 @@ body {
   margin-bottom: 15px;
 }
 
-/* TEXT */
-.title { font-size: 20px; }
+/* text */
+.title {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
 .subtitle {
   font-size: 13px;
   color: #9ca3af;
   margin-bottom: 25px;
 }
 
-/* INPUTS */
-.input-group { margin-bottom: 14px; }
+/* inputs */
+.input-group {
+  margin-bottom: 14px;
+}
 
 label {
   display: block;
@@ -88,20 +136,23 @@ input {
   background: #020617;
   color: #fff;
   font-size: 14px;
+  outline: none;
 }
 
-/* BUTTON */
+input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+}
+
+/* button */
 button {
   width: 100%;
   padding: 15px;
   border-radius: 10px;
   border: none;
 
-  /* сделали более заметный градиент */
   background: linear-gradient(135deg, #22c55e, #16a34a);
-
-  /* ТЕКСТ БЕЛЫЙ (не синий) */
-  color: #ffffff;
+  color: #fff;
 
   font-size: 15px;
   font-weight: 600;
@@ -110,21 +161,21 @@ button {
   transition: 0.2s;
 }
 
-/* hover эффект */
 button:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 15px 35px rgba(34,197,94,0.4);
 }
 
-/* TRUST */
+/* trust */
 .trust {
   margin-top: 20px;
   font-size: 12px;
   color: #cbd5f5;
   text-align: center;
+  line-height: 1.5;
 }
 
-/* FOOTER */
+/* footer */
 .footer {
   margin-top: 15px;
   font-size: 11px;
@@ -132,7 +183,7 @@ button:hover {
   text-align: center;
 }
 
-/* MOBILE */
+/* mobile */
 @media (max-width: 500px) {
   .card {
     width: 100%;
@@ -145,6 +196,7 @@ button:hover {
 
 <body>
 
+<div class="glow"></div>
 <canvas id="bg"></canvas>
 
 <div class="header">
@@ -178,14 +230,15 @@ button:hover {
     </form>
 
     <div class="trust">
-      ✔️ Райффайзенбанк<br>
-      ✔️ Электронный чек<br>
-      ✔️ SSL защита
-    </div>
+      ✔️ Платёж через Райффайзенбанк<br>
+      ✔️ Электронный чек на email<br>
+      ✔️ Защищённое соединение (SSL)
+      </div>
 
     <div class="footer">
       AEY Digital Services<br>
-      ИП Ряховский В.Д.
+      ИП Ряховский В.Д.<br>
+      ИНН 773575164300
     </div>
 
   </div>
@@ -226,6 +279,7 @@ function animate() {
     ctx.fillStyle = "rgba(255,255,255,0.15)";
     ctx.fill();
   });
+
   requestAnimationFrame(animate);
 }
 
