@@ -1,98 +1,164 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AEY Digital Services — Оплата</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оплата</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-      background: #0b1220;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      color: #e5e7eb;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+  background: #0a0f1c;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    .card {
-      width: 380px;
-      background: #111827;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    }
+.wrap {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+  max-width: 900px;
+}
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
+.left {
+  max-width: 320px;
+}
 
-    .desc {
-      font-size: 14px;
-      color: #9ca3af;
-      margin-bottom: 20px;
-    }
+.left h2 {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 12px;
-      border-radius: 10px;
-      border: 1px solid #374151;
-      background: #0f172a;
-      color: white;
-    }
+.left p {
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.5;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #3b82f6;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+.card {
+  width: 380px;
+  background: #111827;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+}
 
-    button:hover {
-      background: #2563eb;
-    }
+input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  color: #fff;
+  outline: none;
+  transition: 0.2s;
+}
 
-    .company {
-      margin-top: 15px;
-      font-size: 12px;
-      text-align: center;
-      color: #9ca3af;
-    }
-  </style>
+input:focus {
+  border-color: #22c55e;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: #22c55e;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #16a34a;
+}
+
+.meta {
+  margin-top: 15px;
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+}
+
+.company {
+  margin-top: 15px;
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.loader {
+  display: none;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .wrap { flex-direction: column; }
+}
+</style>
 </head>
 
 <body>
 
+<div class="wrap">
+
+  <div class="left">
+    <h2>Оплата</h2>
+    <p>
+      Безопасная оплата через защищённый банковский шлюз.<br><br>
+      Данные передаются по зашифрованному соединению и не сохраняются.
+    </p>
+  </div>
+
   <div class="card">
-    <h1>Оплата доступа</h1>
-
-    <div class="desc">
-      AEY Digital Services<br>
-      Оплата проходит через защищённый банк
-    </div>
-
-    <form action="/pay" method="GET">
+    <form id="payForm">
       <input type="number" name="amount" placeholder="Сумма (₽)" required>
-      <input type="email" name="email" placeholder="Email" required>
+      <input type="email" name="email" placeholder="Email для чека" required>
       <input type="text" name="phone" placeholder="Телефон (необязательно)">
-      <button type="submit">Оплатить</button>
+
+      <button id="btn" type="submit">Оплатить</button>
+      <div class="loader" id="loader">Перенаправление...</div>
     </form>
 
+    <div class="meta">🔒 Соединение защищено</div>
+
     <div class="company">
+      AEY Digital Services<br>
       ИП Ряховский Всеволод Дмитриевич<br>
       ИНН 773575164300
     </div>
   </div>
+
+</div>
+
+<script>
+const form = document.getElementById('payForm');
+const btn = document.getElementById('btn');
+const loader = document.getElementById('loader');
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  btn.disabled = true;
+  btn.innerText = "Обработка...";
+  loader.style.display = "block";
+
+  const amount = form.amount.value;
+  const email = form.email.value;
+  const phone = form.phone.value;
+
+  setTimeout(() => {
+    window.location.href = /pay?amount=${amount}&email=${email}&phone=${phone};
+  }, 600);
+});
+</script>
 
 </body>
 </html>
