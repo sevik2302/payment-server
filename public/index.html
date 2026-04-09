@@ -2,61 +2,103 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Оплата</title>
 
   <style>
     body {
       margin: 0;
-      background: #0f172a;
-      font-family: Arial;
-      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #e2e8f0;
 
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       height: 100vh;
     }
 
-    .box {
-      background: #1e293b;
-      padding: 40px;
-      border-radius: 16px;
-      width: 320px;
+    .card {
+      width: 360px;
+      background: rgba(30, 41, 59, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 20px;
     }
 
     input {
       width: 100%;
-      padding: 15px;
-      margin: 10px 0;
+      padding: 14px;
+      margin-bottom: 12px;
       border-radius: 10px;
-      border: none;
-      font-size: 16px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: white;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
     }
 
     button {
       width: 100%;
-      padding: 15px;
-      background: #3b82f6;
-      color: white;
+      padding: 14px;
       border: none;
       border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
       font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(59,130,246,0.3);
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #64748b;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="box">
-    <h2>Оплата</h2>
+  <div class="card">
+    <h1>Оплата услуги</h1>
+    <p>Введите данные для оплаты</p>
 
     <form action="/pay" method="GET">
-      <input type="number" name="amount" placeholder="Сумма" required>
+      <input type="number" name="amount" placeholder="Сумма (₽)" required>
       <input type="email" name="email" placeholder="Email" required>
-      <input type="text" name="phone" placeholder="Телефон">
-      <button>Перейти к оплате</button>
+      <input type="text" name="phone" placeholder="Телефон (необязательно)">
+      <button type="submit">Перейти к оплате</button>
     </form>
+
+    <div class="hint">
+      Безопасная оплата через банк
+    </div>
   </div>
 
 </body>
