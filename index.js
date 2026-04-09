@@ -167,6 +167,13 @@ app.post("/webhook", async (req, res) => {
 // ==================
 const PORT = process.env.PORT || 3000;
 
+app.get("/success", (req, res) => {
+  res.sendFile(__dirname + "/public/success.html");
+});
+
+app.get("/fail", (req, res) => {
+  res.sendFile(__dirname + "/public/fail.html");
+});
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
