@@ -1,38 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <title>Оплата</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0f172a;
+      font-family: Arial;
+      color: white;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 40px;
+      border-radius: 16px;
+      width: 320px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+  </style>
 </head>
+
 <body>
 
-<form action="/pay" method="GET">
-  <input type="number" name="amount" placeholder="Сумма" required />
+  <div class="box">
+    <h2>Оплата</h2>
 
-  <br><br>
-
-  <label>
-    <input type="checkbox" id="needReceipt" />
-    Получить чек
-  </label>
-
-  <div id="receiptFields" style="display:none;">
-    <input type="email" name="email" placeholder="Email" />
-    <input type="text" name="phone" placeholder="Телефон" />
+    <form action="/pay" method="GET">
+      <input type="number" name="amount" placeholder="Сумма" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="phone" placeholder="Телефон">
+      <button>Перейти к оплате</button>
+    </form>
   </div>
-
-  <br>
-  <button type="submit">Оплатить</button>
-</form>
-
-<script>
-  const checkbox = document.getElementById("needReceipt");
-  const fields = document.getElementById("receiptFields");
-
-  checkbox.addEventListener("change", () => {
-    fields.style.display = checkbox.checked ? "block" : "none";
-  });
-</script>
 
 </body>
 </html>
