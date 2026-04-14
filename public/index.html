@@ -31,7 +31,6 @@ body {
 h1 {
     font-size: 20px;
     margin-bottom: 20px;
-    font-weight: 600;
 }
 
 input {
@@ -43,7 +42,6 @@ input {
     background: rgba(255,255,255,0.08);
     color: white;
     outline: none;
-    font-size: 15px;
 }
 
 input:focus {
@@ -58,16 +56,13 @@ button {
     background: linear-gradient(135deg, #22c55e, #16a34a);
     color: white;
     font-weight: 600;
-    font-size: 15px;
     cursor: pointer;
-    transition: 0.2s;
 }
 
 button:hover {
     transform: translateY(-1px);
 }
 
-/* toggle */
 .toggle {
     display: flex;
     justify-content: space-between;
@@ -82,9 +77,7 @@ button:hover {
     height: 22px;
 }
 
-.switch input {
-    display: none;
-}
+.switch input { display:none; }
 
 .slider {
     position: absolute;
@@ -97,10 +90,8 @@ button:hover {
 .slider:before {
     content:"";
     position:absolute;
-    height:16px;
-    width:16px;
-    left:3px;
-    top:3px;
+    height:16px;width:16px;
+    left:3px;top:3px;
     background:white;
     border-radius:50%;
     transition:.3s;
@@ -114,19 +105,8 @@ input:checked + .slider:before {
     transform:translateX(20px);
 }
 
-.hidden {
-    display: none;
-}
+.hidden { display:none; }
 
-/* info text */
-.info {
-    font-size: 12px;
-    opacity: 0.6;
-    margin-top: 12px;
-    line-height: 1.5;
-}
-
-/* animation */
 @keyframes fadeIn {
     from {opacity:0; transform:translateY(20px);}
     to {opacity:1; transform:translateY(0);}
@@ -157,26 +137,15 @@ input:checked + .slider:before {
 
 <button type="submit">Оплатить</button>
 
-<div class="info">
-Платёж обрабатывается через защищённое соединение<br>
-Подтверждение оплаты выполняется в приложении банка
-</div>
-
-<div id="receiptInfo" class="info hidden">
-Чек будет отправлен на указанный email
-</div>
-
 </form>
 </div>
 
 <script>
 const toggle = document.getElementById('toggleEmail');
 const emailField = document.getElementById('emailField');
-const receiptInfo = document.getElementById('receiptInfo');
 
 toggle.addEventListener('change', () => {
     emailField.classList.toggle('hidden', !toggle.checked);
-    receiptInfo.classList.toggle('hidden', !toggle.checked);
 });
 </script>
 
