@@ -10,13 +10,14 @@ body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
     background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #fff;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     height: 100vh;
-    color: white;
 }
 
+/* карточка */
 .container {
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(20px);
@@ -25,50 +26,64 @@ body {
     width: 100%;
     max-width: 380px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-    animation: fadeIn 0.5s ease;
+    animation: fadeIn 0.6s ease;
 }
 
+/* заголовок */
 h1 {
-    font-size: 20px;
     margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* поля */
+.input-group {
+    margin-bottom: 15px;
 }
 
 input {
     width: 100%;
     padding: 14px;
-    margin-bottom: 15px;
     border-radius: 10px;
     border: none;
+    outline: none;
     background: rgba(255,255,255,0.08);
     color: white;
-    outline: none;
+    font-size: 15px;
+    transition: 0.2s;
 }
 
 input:focus {
     background: rgba(255,255,255,0.12);
 }
 
+/* кнопка */
 button {
     width: 100%;
     padding: 14px;
-    border-radius: 10px;
     border: none;
+    border-radius: 10px;
     background: linear-gradient(135deg, #22c55e, #16a34a);
     color: white;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 button:hover {
     transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
+/* тумблер */
 .toggle {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 15px;
     font-size: 14px;
+    opacity: 0.9;
 }
 
 .switch {
@@ -77,39 +92,51 @@ button:hover {
     height: 22px;
 }
 
-.switch input { display:none; }
+.switch input {
+    display: none;
+}
 
 .slider {
     position: absolute;
+    cursor: pointer;
     background: #374151;
     border-radius: 20px;
-    top:0;left:0;right:0;bottom:0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     transition: .3s;
 }
 
 .slider:before {
-    content:"";
-    position:absolute;
-    height:16px;width:16px;
-    left:3px;top:3px;
-    background:white;
-    border-radius:50%;
-    transition:.3s;
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: .3s;
 }
 
 input:checked + .slider {
-    background:#22c55e;
+    background: #22c55e;
 }
 
 input:checked + .slider:before {
-    transform:translateX(20px);
+    transform: translateX(20px);
 }
 
-.hidden { display:none; }
+/* скрытие email */
+.hidden {
+    display: none;
+}
 
+/* анимация */
 @keyframes fadeIn {
-    from {opacity:0; transform:translateY(20px);}
-    to {opacity:1; transform:translateY(0);}
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
 }
 </style>
 </head>
@@ -117,27 +144,28 @@ input:checked + .slider:before {
 <body>
 
 <div class="container">
-<h1>Оплата</h1>
+    <h1>Оплата</h1>
 
-<form action="/create-payment" method="POST">
+    <form action="/create-payment" method="POST">
 
-<input type="number" name="amount" placeholder="Введите сумму" required>
+        <div class="input-group">
+            <input type="number" name="amount" placeholder="Введите сумму" required>
+        </div>
 
-<div class="toggle">
-    <span>Получить чек</span>
-    <label class="switch">
-        <input type="checkbox" id="toggleEmail">
-        <span class="slider"></span>
-    </label>
-</div>
+        <div class="toggle">
+            <span>Получить чек</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleEmail">
+                <span class="slider"></span>
+            </label>
+        </div>
 
-<div id="emailField" class="hidden">
-    <input type="email" name="email" placeholder="Email для чека">
-</div>
+        <div class="input-group hidden" id="emailField">
+            <input type="email" name="email" placeholder="Email для чека">
+        </div>
 
-<button type="submit">Оплатить</button>
-
-</form>
+        <button type="submit">Оплатить</button>
+    </form>
 </div>
 
 <script>
@@ -145,7 +173,11 @@ const toggle = document.getElementById('toggleEmail');
 const emailField = document.getElementById('emailField');
 
 toggle.addEventListener('change', () => {
-    emailField.classList.toggle('hidden', !toggle.checked);
+    if(toggle.checked) {
+        emailField.classList.remove('hidden');
+    } else {
+        emailField.classList.add('hidden');
+    }
 });
 </script>
 
