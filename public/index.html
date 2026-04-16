@@ -13,7 +13,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
   background: radial-gradient(circle at top, #f8fafc, #f1f5f9);
   color: #111827;
-  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* HEADER */
@@ -24,20 +24,6 @@ body {
   padding: 16px 24px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.logo {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.secure {
-  font-size: 13px;
-  color: #6b7280;
 }
 
 /* HERO */
@@ -47,24 +33,20 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0 20px;
 }
 
 .hero-content {
   max-width: 520px;
-  animation: fadeUp 1s ease;
 }
 
 .hero h1 {
   font-size: 44px;
-  margin: 0 0 10px;
-  letter-spacing: -1px;
+  margin: 0;
 }
 
 .hero p {
   color: #6b7280;
-  font-size: 16px;
-  margin-bottom: 25px;
+  margin: 10px 0 20px;
 }
 
 .hero button {
@@ -74,118 +56,31 @@ body {
   background: linear-gradient(135deg, #facc15, #f59e0b);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
   box-shadow: 0 10px 20px rgba(250,204,21,0.25);
 }
 
-.hero button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 14px 30px rgba(250,204,21,0.35);
-}
-
-/* WRAPPER */
+/* FORM WRAP */
 .wrapper {
   display: flex;
   justify-content: center;
-  padding: 80px 16px;
+  padding: 60px 16px;
 }
 
-/* CARD */
 .card {
   width: 420px;
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(10px);
+  background: white;
   border-radius: 16px;
   padding: 28px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-  animation: fadeUp 0.8s ease;
-}
-
-/* TEXT */
-.title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.subtitle {
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 24px;
 }
 
 /* INPUTS */
-.input-group {
-  margin-bottom: 16px;
-  transition: all 0.2s ease;
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  margin-bottom: 6px;
-  color: #374151;
-}
-
 input {
   width: 100%;
   padding: 12px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-  font-size: 14px;
-  outline: none;
-  transition: 0.2s;
-  background: #fff;
-}
-
-input:focus {
-  border-color: #facc15;
-  box-shadow: 0 0 0 3px rgba(250,204,21,0.15);
-}
-
-/* TOGGLE */
-.toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-.switch {
-  position: relative;
-  width: 42px;
-  height: 22px;
-}
-
-.switch input { display: none; }
-
-.slider {
-  position: absolute;
-  background: #d1d5db;
-  border-radius: 20px;
-  top:0;left:0;right:0;bottom:0;
-  transition: .3s;
-}
-
-.slider:before {
-  content:"";
-  position:absolute;
-  height:16px;
-  width:16px;
-  left:3px;
-  top:3px;
-  background:white;
-  border-radius:50%;
-  transition:.3s;
-}
-
-input:checked + .slider {
-  background:#facc15;
-}
-
-input:checked + .slider:before {
-  transform:translateX(20px);
+  margin-top: 6px;
 }
 
 /* BUTTON */
@@ -195,49 +90,44 @@ button {
   border-radius: 12px;
   border: none;
   background: linear-gradient(135deg, #facc15, #f59e0b);
-  color: #000;
   font-weight: 600;
-  font-size: 15px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 10px 25px rgba(250,204,21,0.25);
 }
 
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(250,204,21,0.3);
+/* LIQUID OVERLAY */
+.liquid {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              width 0.8s ease,
+              height 0.8s ease,
+              border-radius 0.8s ease;
 }
 
-/* INFO */
-.info {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 14px;
-  line-height: 1.5;
+/* EXPAND STATE */
+.liquid.active {
+  width: 3000px;
+  height: 3000px;
+  border-radius: 0%;
 }
 
-/* FOOTER */
-.footer {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 12px;
-  color: #9ca3af;
-  padding-bottom: 30px;
+/* PAGE SWITCH */
+.pay-form {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.5s ease;
 }
 
-/* UTIL */
-.hidden { display:none; }
-
-/* ANIMATION */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.pay-form.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
 </head>
@@ -245,80 +135,56 @@ button:hover {
 <body>
 
 <div class="header">
-  <div class="logo">Сделка FKwallet</div>
-  <div class="secure">Безопасная оплата</div>
+  <div>Сделка FKwallet</div>
+  <div>Secure</div>
 </div>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-content">
     <h1>Оплата сделки</h1>
-    <p>Быстро. Безопасно. Через защищённый банковский канал</p>
-    <button onclick="scrollToPay()">Перейти к оплате</button>
+    <p>Быстро и безопасно через банк</p>
+    <button id="startBtn">Перейти к оплате</button>
   </div>
 </section>
 
-<!-- PAYMENT -->
-<div class="wrapper" id="paySection">
-  <div class="card">
+<!-- FORM -->
+<div class="wrapper">
+  <div class="card pay-form" id="form">
 
-    <div class="title">Оплата</div>
-    <div class="subtitle">Введите данные для проведения платежа</div>
+    <form action="/redirect.html" method="GET">
 
-    <form action="redirect.html" method="GET">
+      <label>Сумма</label>
+      <input type="number" name="amount" required>
 
-      <div class="input-group">
-        <label>Сумма</label>
-        <input type="number" name="amount" required placeholder="Введите сумму">
-      </div>
-
-      <div class="toggle">
-        <span>Отправить чек</span>
-        <label class="switch">
-          <input type="checkbox" id="toggleEmail">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div id="emailField" class="hidden input-group">
-        <label>Email</label>
-        <input type="email" name="email" placeholder="example@mail.com">
-      </div>
+      <label style="margin-top:12px;">Email</label>
+      <input type="email" name="email">
 
       <button type="submit">Оплатить</button>
-
-      <div class="info">
-        Платёж обрабатывается через защищённое соединение<br>
-        Подтверждение выполняется в приложении банка
-      </div>
-
-      <div id="receiptInfo" class="info hidden">
-        Чек будет отправлен на указанный email
-      </div>
 
     </form>
 
   </div>
 </div>
 
-<div class="footer">
-AEY Digital Services • ИП Ряховский В.Д.
-</div>
+<!-- LIQUID LAYER -->
+<div class="liquid" id="liquid"></div>
 
 <script>
-function scrollToPay() {
-  document.getElementById('paySection').scrollIntoView({
-    behavior: 'smooth'
-  });
-}
+const btn = document.getElementById('startBtn');
+const liquid = document.getElementById('liquid');
+const form = document.getElementById('form');
 
-const toggle = document.getElementById('toggleEmail');
-const emailField = document.getElementById('emailField');
-const receiptInfo = document.getElementById('receiptInfo');
+btn.addEventListener('click', () => {
 
-toggle.addEventListener('change', () => {
-  emailField.classList.toggle('hidden', !toggle.checked);
-  receiptInfo.classList.toggle('hidden', !toggle.checked);
+  // старт "жидкости"
+  liquid.classList.add('active');
+
+  // потом показываем форму
+  setTimeout(() => {
+    form.classList.add('show');
+  }, 500);
+
 });
 </script>
 
