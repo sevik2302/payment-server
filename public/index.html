@@ -13,7 +13,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
   background: radial-gradient(circle at top, #f8fafc, #f1f5f9);
   color: #111827;
-  overflow-x: hidden;
 }
 
 /* HEADER */
@@ -24,7 +23,13 @@ body {
   padding: 16px 24px;
   display: flex;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
+
+.logo { font-weight: 600; }
+.secure { font-size: 13px; color: #6b7280; }
 
 /* HERO */
 .hero {
@@ -37,6 +42,7 @@ body {
 
 .hero-content {
   max-width: 520px;
+  position: relative;
 }
 
 .hero h1 {
@@ -49,29 +55,46 @@ body {
   margin: 10px 0 20px;
 }
 
-.hero button {
+/* 🔥 MORPH BUTTON */
+.morph-btn {
   padding: 14px 26px;
   border-radius: 14px;
   border: none;
   background: linear-gradient(135deg, #facc15, #f59e0b);
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(250,204,21,0.25);
+  box-shadow: 0 10px 25px rgba(250,204,21,0.25);
+  transition: transform .2s ease;
 }
 
-/* FORM WRAP */
+.morph-btn:hover {
+  transform: scale(1.03);
+}
+
+/* WRAPPER */
 .wrapper {
   display: flex;
   justify-content: center;
-  padding: 60px 16px;
+  padding: 80px 16px;
 }
 
+/* CARD */
 .card {
   width: 420px;
   background: white;
   border-radius: 16px;
   padding: 28px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+
+  opacity: 0;
+  transform: translateY(40px);
+  transition: 0.6s ease;
+}
+
+/* reveal state */
+.card.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* INPUTS */
@@ -83,51 +106,48 @@ input {
   margin-top: 6px;
 }
 
-/* BUTTON */
-button {
+/* 🔥 MORPH LAYER */
+.morph {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, #facc15, #f59e0b);
-  font-weight: 600;
-  cursor: pointer;
+  height: 100%;
+  background: transparent;
+  pointer-events: none;
+  z-index: 999;
 }
 
-/* LIQUID OVERLAY */
-.liquid {
-  position: fixed;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #facc15, #f59e0b);
-  top: 50%;
+/* это “жидкость” */
+.morph::before {
+  content: "";
+  position: absolute;
+  top: var(--y, 50%);
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 999;
-  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
-              width 0.8s ease,
-              height 0.8s ease,
-              border-radius 0.8s ease;
+  width: 180px;
+  height: 60px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #facc15, #ffffff);
+  transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: blur(0px);
 }
 
-/* EXPAND STATE */
-.liquid.active {
-  width: 3000px;
-  height: 3000px;
-  border-radius: 0%;
+/* active state = растекание */
+.morph.active::before {
+  width: 300vw;
+  height: 300vh;
+  border-radius: 0;
+  filter: blur(0px);
+  background: white;
 }
 
-/* PAGE SWITCH */
-.pay-form {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: 0.5s ease;
-}
-
-.pay-form.show {
-  opacity: 1;
-  transform: translateY(0);
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 40px;
+  font-size: 12px;
+  color: #9ca3af;
 }
 </style>
 </head>
@@ -135,55 +155,68 @@ button {
 <body>
 
 <div class="header">
-  <div>Сделка FKwallet</div>
-  <div>Secure</div>
+  <div class="logo">Сделка FKwallet</div>
+  <div class="secure">Безопасная оплата</div>
 </div>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-content">
+
     <h1>Оплата сделки</h1>
-    <p>Быстро и безопасно через банк</p>
-    <button id="startBtn">Перейти к оплате</button>
+    <p>Плавный банковский переход</p>
+
+    <button class="morph-btn" id="btn">
+      Перейти к оплате
+    </button>
+
   </div>
 </section>
 
-<!-- FORM -->
+<!-- PAYMENT -->
 <div class="wrapper">
-  <div class="card pay-form" id="form">
+  <div class="card" id="card">
 
-    <form action="/redirect.html" method="GET">
+    <div style="font-size:18px;font-weight:600;margin-bottom:4px;">Оплата</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:20px;">
+      Введите данные
+    </div>
 
-      <label>Сумма</label>
-      <input type="number" name="amount" required>
+    <label>Сумма</label>
+    <input type="number" placeholder="Введите сумму">
 
-      <label style="margin-top:12px;">Email</label>
-      <input type="email" name="email">
-
-      <button type="submit">Оплатить</button>
-
-    </form>
+    <label style="margin-top:12px;">Email</label>
+    <input type="email" placeholder="example@mail.com">
 
   </div>
 </div>
 
-<!-- LIQUID LAYER -->
-<div class="liquid" id="liquid"></div>
+<div class="footer">
+AEY Digital Services
+</div>
+
+<!-- MORPH LAYER -->
+<div class="morph" id="morph"></div>
 
 <script>
-const btn = document.getElementById('startBtn');
-const liquid = document.getElementById('liquid');
-const form = document.getElementById('form');
+const btn = document.getElementById('btn');
+const morph = document.getElementById('morph');
+const card = document.getElementById('card');
 
 btn.addEventListener('click', () => {
 
-  // старт "жидкости"
-  liquid.classList.add('active');
+  const rect = btn.getBoundingClientRect();
 
-  // потом показываем форму
+  // позиция кнопки → точка старта жидкости
+  morph.style.setProperty('--y', rect.top + 'px');
+
+  // активируем "жидкость"
+  morph.classList.add('active');
+
+  // через чуть-чуть показываем форму
   setTimeout(() => {
-    form.classList.add('show');
-  }, 500);
+    card.classList.add('show');
+  }, 400);
 
 });
 </script>
