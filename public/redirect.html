@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Безопасная обработка</title>
 
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+  background: radial-gradient(circle at top, #f8fafc, #eef2f7);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CARD */
+.box {
+  text-align: center;
+  max-width: 520px;
+  padding: 20px;
+  animation: fadeUp 0.9s ease;
+}
+
+/* BIG TEXT */
+.title {
+  font-size: 38px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+/* SUBTEXT */
+.subtitle {
+  font-size: 15px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+/* LOADER */
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid #e5e7eb;
+  border-top-color: #facc15;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+/* HINT */
+.hint {
+  margin-top: 18px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ANIMATIONS */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <div class="title">Перенаправляем на оплату</div>
+
+  <div class="subtitle">
+    Проверяем данные и создаём безопасное соединение с банком<br>
+    Это займёт несколько секунд
+  </div>
+
+  <div class="loader"></div>
+
+  <div class="hint">
+    Не закрывайте страницу
+  </div>
+</div>
+
+<script>
+setTimeout(() => {
+  // ВАЖНО: прокидываем параметры дальше в /pay
+  const params = window.location.search;
+  window.location.href = "/pay" + params;
+}, 2500);
+</script>
+
+</body>
+</html>
